@@ -19,4 +19,5 @@ Route::get('/', function () {
 
 // Name can include '/' character
 Route::get('package/{name?}', 'App\Http\Controllers\PackageController@show')
-    ->where('name', '(.*)');
+    ->where('name', '(.*)')
+    ->name('show-package');
