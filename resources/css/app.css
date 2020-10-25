@@ -1,5 +1,57 @@
 @import "tailwindcss/base";
 
+a {
+    @apply text-blue-800 underline;
+}
+
 @import "tailwindcss/components";
+
+/*====================================*\
+  COMPONENTS
+  site-search
+\*====================================*/
+
+.site-search {
+  @apply w-full max-w-sm bg-white relative;
+}
+
+.site-search__input {
+  @apply font-sans text-sm p-2 leading-none w-full border-gray-800 bg-gray-200;
+}
+
+.site-search__input::placeholder {
+  @apply text-gray-700 italic opacity-100;
+}
+
+.site-search__input::-webkit-input-placeholder {
+  @apply leading-normal;
+}
+
+.site-search__results-list {
+  @apply mt-0 border z-20;
+}
+
+.site-search__result {
+  @apply p-2 border-t cursor-pointer;
+}
+
+.site-search__result:first-child {
+    @apply border-t-0;
+  }
+
+.site-search__result[aria-selected='true'] ,
+.site-search__result:hover {
+  @apply bg-gray-200;
+}
+
+@screen md {
+  .site-search__input {
+    @apply text-base;
+  }
+
+  .site-search__results-list {
+    @apply bg-white w-full;
+  }
+}
 
 @import "tailwindcss/utilities";

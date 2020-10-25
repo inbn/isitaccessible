@@ -1,34 +1,65 @@
 <div>
-    <label for="query">Search for a package</label>
-    <input
-        id="query"
-        type="text"
-        wire:model="query"
-        wire:keydown.escape="resetForm"
-        wire:keydown.tab="resetForm"
-        wire:keydown.ArrowUp="decrementHighlight"
-        wire:keydown.ArrowDown="incrementHighlight"
-        wire:keydown.enter="selectPackage"
-    >
-
-    <div wire:loading class="absolute z-10 list-group bg-white w-full rounded-t-none shadow-lg">
-        <div class="list-item">Searching...</div>
-    </div>
-
-    @if(!empty($query))
-        <div class="fixed top-0 right-0 bottom-0 left-0" wire:click="resetForm"></div>
-
-        <div class="absolute z-10 list-group bg-white w-full rounded-t-none shadow-lg">
-            @if(!empty($packages))
-                @foreach($packages as $i => $package)
-                    <a
-                        href="{{ route('show-package', $package['name']) }}"
-                        class="list-item {{ $highlightIndex === $i ? 'highlight' : '' }}"
-                    >{{ $package['name'] }}</a>
-                @endforeach
-            @else
-                <div class="list-item">No results!</div>
-            @endif
+    <div className="site-search">
+        @if (!empty($query) && !empty($packages))
+            <p
+              class="search-results-count sr-only"
+              id="search-results-count"
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              Found {{ count($packages) }} results for “{{ $query }}”
+            </p>
+        @endif
+        <label for="search-input">Search for a package</label>
+        <div
+            role="combobox"
+            aria-expanded="{{ !empty($packages) && !empty($query) ? 'true' : 'false' }}"
+            aria-owns="search-results-listbox"
+            aria-haspopup="listbox"
+        >
+            <input
+                id="query"
+                type="text"
+                id="search-input"
+                class="site-search__input"
+                placeholder="Search packages"
+                autoComplete="off"
+                aria-autocomplete="list"
+                aria-controls="search-results-listbox"
+                aria-activedescendant="{{ (!empty($packages) && !empty($query)) ? 'result-item-' . $highlightIndex : '' }}"
+                wire:model="query"
+                wire:keydown.escape="resetForm"
+                wire:keydown.tab="resetForm"
+                wire:keydown.arrow-up="decrementHighlight"
+                wire:keydown.arrow-down="incrementHighlight"
+                wire:keydown.enter="selectPackage"
+            >
         </div>
-    @endif
+
+        @if(!empty($query))
+            <ol
+                id="search-results-listbox"
+                class="site-search__results-list"
+                role="listbox"
+                {{ (empty($packages) || empty($query)) ? 'hidden' : '' }}
+            >
+                @if(!empty($packages))
+                    @foreach($packages as $i => $package)
+                        <li
+                            id="result-item-{{ $i }}"
+                            role="option"
+                            class="site-search__result"
+                            aria-selected="{{ $highlightIndex === $i ? 'true' : 'false' }}"
+                            wire:key="{{ $package['id'] }}"
+                            wire:click="selectPackage({{ $i }})"
+                        >
+                            {{ $package['name'] }}
+                       </li>
+                    @endforeach
+                @else
+                    <li class="site-search__result hover:bg-white">No results. Press enter to search.</li>
+                @endif
+            </ol>
+        @endif
+    </div>
 </div>

@@ -11,6 +11,11 @@ class Search extends Component
     public $packages;
     public $highlightIndex;
 
+    public function mount()
+    {
+        $this->resetForm();
+    }
+
     public function resetForm()
     {
         $this->query = '';
@@ -38,12 +43,24 @@ class Search extends Component
         $this->highlightIndex--;
     }
 
-    public function selectPackage()
+    public function selectPackage($packageIndex = null)
     {
-        $package = $this->packages[$this->highlightIndex] ?? null;
+        if ($packageIndex)
+        {
+            $package = $this->packages[$packageIndex];
+        }
+        else
+        {
+            $package = $this->packages[$this->highlightIndex] ?? null;
+        }
+
         if ($package)
         {
             $this->redirect(route('show-package', $package['name']));
+        }
+        else if (!empty($this->query))
+        {
+            $this->redirect(route('show-package', $this->query));
         }
     }
 
@@ -56,6 +73,7 @@ class Search extends Component
         //     ->toArray();
 
         $this->packages = Package::where('name', 'like', '%' . $this->query . '%')
+            ->take(10)
             ->get()
             ->toArray();
     }
