@@ -1,7 +1,6 @@
 <div>
-    {{-- If you look to others for fulfillment, you will never truly be fulfilled. --}}
-    <input type="text" wire:model="searchTerm">
-
+    <label for="searchTerm">Search for a package</label>
+    <input id="searchTerm" type="text" wire:model="searchTerm">
     <ul>
         @foreach($packages as $package)
             <li>

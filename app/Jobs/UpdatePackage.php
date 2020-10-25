@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Models\Package;
-use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -34,34 +33,9 @@ class UpdatePackage implements ShouldQueue
      */
     public function handle()
     {
-        $today = new Carbon;
-
-        if ($this->package->npm_synced_at !== null)
-        {
-            $npm_synced_at = Carbon::createFromFormat('Y-m-d H:s:i', $this->package->npm_synced_at);
-            // If the package hasn't been synced for over 24 hours
-            if ($today->diffInHours($npm_synced_at) > 24)
-            {
-                $this->package->updateFromNpm();
-            }
-        }
-        else
-        {
-            $this->package->updateFromNpm();
-        }
-
-        if ($this->package->github_synced_at !== null)
-        {
-            $github_synced_at = Carbon::createFromFormat('Y-m-d H:s:i', $this->package->github_synced_at);
-            // If the github repo hasn't been synced for over 6 hours
-            if ($today->diffInHours($github_synced_at) > 6)
-            {
-                $this->package->updateFromGithub();
-            }
-        }
-        else
-        {
-            $this->package->updateFromGithub();
-        }
+        // To stop going over the 30 requests per minute rate limit for the
+        // GitHub search endpoint, we wait 2 seconds between jobs
+        sleep(2);
+        $this->package->sync();
     }
 }

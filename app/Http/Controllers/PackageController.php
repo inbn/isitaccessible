@@ -19,7 +19,7 @@ class PackageController extends Controller
     {
         $package = Package::firstOrCreate(['name' => $name]);
 
-        UpdatePackage::dispatch($package);
+        $package->sync();
 
         return view('package.show', ['package' => $package]);
     }

@@ -2,15 +2,17 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Http;
-
+use Laravel\Scout\Searchable;
 use GrahamCampbell\GitHub\Facades\GitHub;
 
 class Package extends Model
 {
     use HasFactory;
+    use Searchable;
 
     protected $fillable = ['name'];
 
@@ -39,30 +41,68 @@ class Package extends Model
     }
 
     /**
+     * Get the indexable data array for the model.
+     *
+     * @return array
+     */
+    public function toSearchableArray()
+    {
+        $array = [
+            'id' => $this->id,
+            'name' => $this->name,
+        ];
+
+        return $array;
+    }
+
+    /**
+     * Fetch data from npm and GitHub APIs if out of date
+     */
+    public function sync()
+    {
+        $today = new Carbon;
+
+        if ($this->npm_synced_at !== null)
+        {
+            $npm_synced_at = Carbon::createFromFormat('Y-m-d H:s:i', $this->npm_synced_at);
+            // If the package hasn't been synced for over 24 hours
+            if ($today->diffInHours($npm_synced_at) > 24)
+            {
+                $this->updateFromNpm();
+            }
+        }
+        else
+        {
+            $this->updateFromNpm();
+        }
+
+        if ($this->github_synced_at !== null)
+        {
+            $github_synced_at = Carbon::createFromFormat('Y-m-d H:s:i', $this->github_synced_at);
+            // If the github repo hasn't been synced for over 6 hours
+            if ($today->diffInHours($github_synced_at) > 6)
+            {
+                $this->updateFromGithub();
+            }
+        }
+        else
+        {
+            $this->updateFromGithub();
+        }
+    }
+
+    /**
      * Fetch data about the package from the npm API
      */
     public function updateFromNpm()
     {
         $package_name = $this->name;
 
-        // We could use the npm view command to retrieve data about the package
-        // $json = shell_exec('npm view '. $package_name . ' -json 2>&1');
-        // $data = json_decode($json);
-
-        // var_dump($json);
-
-        // // If the package doesn't exist, delete this record
-        // if (isset($data->error->code) && $data->error->code === 'E404')
-        // {
-        //     $this->delete();
-        //     return;
-        // }
-
-        $apiUrl = 'https://api.npms.io/v2/package/';
+        $api_url = 'https://api.npms.io/v2/package/';
 
         // But let's use the npms.io api instead
         // urlencode required because of '@' and '/' characters
-        $response = Http::get($apiUrl . urlencode($package_name));
+        $response = Http::get($api_url . urlencode($package_name));
 
         $data = json_decode($response);
         $metadata = $data->collected->metadata;

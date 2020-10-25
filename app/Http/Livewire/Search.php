@@ -14,9 +14,7 @@ class Search extends Component
     {
         if (!empty($this->searchTerm))
         {
-            $searchTerm = '%' . $this->searchTerm. '%';
-
-            $this->packages = Package::where('name', 'like', $searchTerm)->get();
+            $this->packages = Package::search($this->searchTerm)->get();
         }
         else
         {
