@@ -16,3 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Name can include '/' character
+Route::get('package/{name?}', 'App\Http\Controllers\PackageController@show')
+    ->where('name', '(.*)');
