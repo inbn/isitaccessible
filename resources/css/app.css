@@ -2,7 +2,7 @@
 
 * + ol,
 * + dl,
-* + ul
+* + ul,
 * + h1,
 * + h2,
 * + h3,
@@ -30,7 +30,7 @@ a {
 \*====================================*/
 
 .site-search {
-  @apply w-full max-w-sm bg-white relative;
+  @apply w-full bg-white relative;
 }
 
 .site-search__input {

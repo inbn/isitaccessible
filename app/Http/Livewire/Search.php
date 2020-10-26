@@ -74,7 +74,7 @@ class Search extends Component
 
         // Use case-insensitive like if database on postgres
         $this->packages = Package::where('name', config('database.default') === 'pgsql' ? 'ilike' : 'like', '%' . $this->query . '%')
-            ->take(10)
+            ->take(20)
             ->get()
             ->toArray();
     }
