@@ -6,18 +6,21 @@
 
         <p>{{ $package->description }}</p>
 
-        <h2 class="text-xl font-bold">GitHub issues mentioning accessibility</h2>
-        <dl>
-            <dt>Open</dt>
-            <dd>{{ count($package->openGithubIssues) }}</dd>
+        <h2 class="text-2xl font-bold">GitHub issues mentioning accessibility</h2>
+        <dl class="flex justify-around">
+            <div class="flex flex-col text-center">
+                <dt>Open</dt>
+                <dd class="text-3xl font-bold">{{ count($package->openGithubIssues) }}</dd>
+            </div>
 
-            <dt>Closed</dt>
-            <dd>{{ count($package->closedGithubIssues) }}</dd>
+            <div class="flex flex-col text-center">
+                <dt>Closed</dt>
+                <dd class="text-3xl font-bold">{{ count($package->closedGithubIssues) }}</dd>
+            </div>
         </dl>
 
-        <h3 class="text-lg font-bold">Open issues</h3>
-
-        @if (count($package->githubIssues) > 0)
+        @if (count($package->openGithubIssues) > 0)
+            <h3 class="text-lg font-bold">Open issues</h3>
             <ul>
                 @foreach ($package->openGithubIssues->sortByDesc('daysOld') as $issue)
                     <li>
@@ -28,6 +31,10 @@
             </ul>
         @endif
 
-        <a href="/" class="mt-8 block text-center">Search again</a>
+        <h2 class="text-2xl font-bold">axe score</h2>
+
+        <p class="text-gray-700 italic">Coming soon</p>
+
+        <a href="/" class="mt-8 block text-center">Search for another package</a>
     </div>
 @endsection

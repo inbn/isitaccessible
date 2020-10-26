@@ -1,5 +1,10 @@
 @import "tailwindcss/base";
 
+/*====================================*\
+  BASE
+  links
+\*====================================*/
+
 a {
     @apply text-blue-800 underline;
 }

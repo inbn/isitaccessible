@@ -10,7 +10,7 @@
               Found {{ count($packages) }} results for “{{ $query }}”
             </p>
         @endif
-        <label for="search-input">Search for a package</label>
+        <label for="search-input" class="sr-only">Search by the package name</label>
         <div
             role="combobox"
             aria-expanded="{{ !empty($packages) && !empty($query) ? 'true' : 'false' }}"
