@@ -66,17 +66,16 @@ class Search extends Component
 
     public function updatedQuery()
     {
-        // TNTSearch throws 'SQLSTATE[HY000]: General error: 10 disk I/O error'
-        // on the server
-        // $this->packages = Package::search($this->query)
-        //     ->get()
-        //     ->toArray();
-
-        // Use case-insensitive like if database on postgres
-        $this->packages = Package::where('name', config('database.default') === 'pgsql' ? 'ilike' : 'like', '%' . $this->query . '%')
+        $this->packages = Package::search($this->query)
             ->take(20)
             ->get()
             ->toArray();
+
+        // Use case-insensitive like if database on postgres
+        // $this->packages = Package::where('name', config('database.default') === 'pgsql' ? 'ilike' : 'like', '%' . $this->query . '%')
+        //     ->take(20)
+        //     ->get()
+        //     ->toArray();
     }
 
     public function render()
