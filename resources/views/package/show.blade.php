@@ -6,7 +6,17 @@
 
         <p>{{ $package->description }}</p>
 
-        <h2 class="text-2xl font-bold">GitHub issues mentioning accessibility</h2>
+        <h2 class="text-lg font-bold">Links</h2>
+
+        <ul>
+            <li><a href="https://github.com/{{ $package->repo }}">GitHub</a></li>
+            <li><a href="https://www.npmjs.com/package/{{ $package->name }}">NPM</a></li>
+        </ul>
+
+        <h2 class="text-2xl font-bold">GitHub issues</h2>
+
+        <p>{{ count($package->githubIssues) }} issue{{ count($package->githubIssues) !== 1 ? 's' : '' }} mention accessibility</p>
+
         <dl class="flex justify-around">
             <div class="flex flex-col text-center">
                 <dt>Open</dt>
@@ -21,6 +31,7 @@
 
         @if (count($package->openGithubIssues) > 0)
             <h3 class="text-lg font-bold">Open issues</h3>
+
             <ul>
                 @foreach ($package->openGithubIssues->sortByDesc('daysOld') as $issue)
                     <li>
@@ -32,6 +43,10 @@
         @endif
 
         <h2 class="text-2xl font-bold">axe score</h2>
+
+        <p class="text-gray-700 italic">Coming soon</p>
+
+        <h2 class="text-2xl font-bold">Inclusive language score</h2>
 
         <p class="text-gray-700 italic">Coming soon</p>
 

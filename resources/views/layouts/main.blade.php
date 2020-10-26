@@ -9,7 +9,7 @@
         @livewireStyles
     </head>
     <body>
-        <div class="container mx-auto">
+        <div class="container mx-auto p-4">
             @yield('content')
         </div>
 
