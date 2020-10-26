@@ -21,6 +21,11 @@ class PackageController extends Controller
 
         $package->sync();
 
+        if (!$package->repo)
+        {
+            abort(404, 'Failed to find that package on npm');
+        }
+
         return view('package.show', ['package' => $package]);
     }
 }

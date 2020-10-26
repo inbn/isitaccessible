@@ -105,13 +105,18 @@ class Package extends Model
         $response = Http::get($api_url . urlencode($package_name));
 
         $data = json_decode($response);
-        $metadata = $data->collected->metadata;
 
-        $this->description = $metadata->description;
-        $this->homepage_url = isset($data->collected->github->homepage)
-            ? $data->collected->github->homepage
-            : (isset($metadata->links->homepage) ? $metadata->links->homepage : NULL);
-        $this->repo = extractGitHubRepoFromUrl($metadata->repository->url);
+        if ($response->status() === 200)
+        {
+            $metadata = $data->collected->metadata;
+
+            $this->description = $metadata->description;
+            $this->homepage_url = isset($data->collected->github->homepage)
+                ? $data->collected->github->homepage
+                : (isset($metadata->links->homepage) ? $metadata->links->homepage : NULL);
+            $this->repo = extractGitHubRepoFromUrl($metadata->repository->url);
+        }
+
         $this->npm_synced_at = now();
 
         $this->save();
@@ -125,23 +130,27 @@ class Package extends Model
         // If date is newer than 1 hour, return
         $repo = $this->repo;
 
-        // TODO search API does not account for redirects. e.g. if a user moves
-        // repo but doesn't update npm. Come up with a solution for this
-        $data = GitHub::search()->issues('accessibility repo:' . $repo . ' type:issue');
-        $issues = $data['items'];
+        if ($repo !== null)
+        {
+            // TODO search API does not account for redirects. e.g. if a user moves
+            // repo but doesn't update npm. Come up with a solution for this
+            $data = GitHub::search()->issues('accessibility repo:' . $repo . ' type:issue');
+            $issues = $data['items'];
 
-        foreach ($issues as $issue) {
-            GithubIssue::updateOrCreate(
-                [
-                    'url' => $issue['html_url']
-                ],
-                [
-                    'package_id' => $this->id,
-                    'title' => $issue['title'],
-                    'state' => $issue['state'],
-                    'issue_created_at' => date('Y-m-d H:i:s', strtotime($issue['created_at'])),
-                ]
-            );
+            foreach ($issues as $issue)
+            {
+                GithubIssue::updateOrCreate(
+                    [
+                        'url' => $issue['html_url']
+                    ],
+                    [
+                        'package_id' => $this->id,
+                        'title' => $issue['title'],
+                        'state' => $issue['state'],
+                        'issue_created_at' => date('Y-m-d H:i:s', strtotime($issue['created_at'])),
+                    ]
+                );
+            }
         }
 
         $this->github_synced_at = now();
