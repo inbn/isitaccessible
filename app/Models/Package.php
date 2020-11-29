@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -38,6 +39,16 @@ class Package extends Model
     public function openGithubIssues()
     {
         return $this->hasMany('App\Models\GithubIssue')->where('state', 'open');
+    }
+
+    /**
+     * Get the index name for the model.
+     *
+     * @return string
+     */
+    public function searchableAs()
+    {
+        return App::environment() . '_packages';
     }
 
     /**
@@ -109,11 +120,16 @@ class Package extends Model
         {
             $metadata = $data->collected->metadata;
 
-            $this->description = $metadata->description;
+            $this->description = isset($metadata->description) ? $metadata->description : null;
             $this->homepage_url = isset($data->collected->github->homepage)
                 ? $data->collected->github->homepage
                 : (isset($metadata->links->homepage) ? $metadata->links->homepage : NULL);
             $this->repo = extractGitHubRepoFromUrl($metadata->repository->url);
+        }
+        else
+        {
+            // Remove this record from the search index
+            $this->unsearchable();
         }
 
         $this->npm_synced_at = now();
@@ -136,19 +152,29 @@ class Package extends Model
             }
             catch (\Github\Exception\ValidationFailedException $e)
             {
-                // The search end point may error if a user moves a repo but
-                // doesn't update npm. Check the repo end point to see if it has
-                // moved
-                list($user_name, $repo_name) = explode('/', $repo);
-                $repo_data = GitHub::repo()->show($user_name, $repo_name);
-
-                if ($repo_data['full_name'] !== $repo)
+                try
                 {
-                    $this->repo = $repo_data['full_name'];
-                }
+                    // The search end point may error if a user moves a repo but
+                    // doesn't update npm. Check the repo end point to see if it has
+                    // moved
+                    list($user_name, $repo_name) = explode('/', $repo);
+                    $repo_data = GitHub::repo()->show($user_name, $repo_name);
 
-                // Search again
-                $data = GitHub::search()->issues('accessibility repo:' . $repo_data['full_name'] . ' type:issue');
+                    if ($repo_data['full_name'] !== $repo)
+                    {
+                        $this->repo = $repo_data['full_name'];
+                    }
+
+                    // Search again
+                    $data = GitHub::search()->issues('accessibility repo:' . $repo_data['full_name'] . ' type:issue');
+                }
+                catch (\Github\Exception\RuntimeException $e)
+                {
+                    // Remove this record from the search index
+                    $this->unsearchable();
+
+                    abort(404, 'Failed to find GitHub repository');
+                }
             }
 
             $issues = $data['items'];
@@ -170,6 +196,8 @@ class Package extends Model
         }
 
         $this->github_synced_at = now();
+        // Add to the search index
+        $this->searchable();
         $this->save();
     }
 }
