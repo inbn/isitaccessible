@@ -23,14 +23,6 @@ jobs:
     #     git add -f public/
     #     git commit -m "Build front-end assets"
     #     git push -f origin deploy
-    # - name: Deploy to production
-    #   uses: appleboy/ssh-action@master
-    #   with:
-    #     host: ${{ secrets.DEPLOY_HOST }}
-    #     username: ${{ secrets.DEPLOY_USER }}
-    #     key: ${{ secrets.DEPLOY_KEY }}
-    #     port: ${{ secrets.DEPLOY_PORT }}
-    #     script: 'cd ${{ secrets.DEPLOY_TARGET }} && ./server_deploy.sh'
     - name: ssh deploy
       uses: easingthemes/ssh-deploy@v2.1.5
       env:
@@ -39,3 +31,14 @@ jobs:
         REMOTE_USER: ${{ secrets.DEPLOY_USER }}
         REMOTE_PORT: ${{ secrets.DEPLOY_PORT }}
         TARGET: ${{ secrets.DEPLOY_TARGET }}
+    - name: Deploy to production
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.DEPLOY_HOST }}
+        username: ${{ secrets.DEPLOY_USER }}
+        key: ${{ secrets.DEPLOY_KEY }}
+        port: ${{ secrets.DEPLOY_PORT }}
+        script: |
+          cd ${{ secrets.DEPLOY_TARGET }}
+          php artisan migrate --force
+          php artisan optimize
