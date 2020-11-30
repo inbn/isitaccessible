@@ -30,11 +30,11 @@ jobs:
     #     port: ${{ secrets.DEPLOY_PORT }}
     #     script: 'cd ${{ secrets.DEPLOY_TARGET }} && ./server_deploy.sh'
     - name: ssh deploy
-        uses: easingthemes/ssh-deploy@v2.1.4
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_KEY }}
-          REMOTE_HOST: ${{ secrets.DEPLOY_HOST }}
-          REMOTE_USER: ${{ secrets.DEPLOY_USER }}
-          REMOTE_PORT: ${{ secrets.DEPLOY_PORT }}
-          SOURCE: "dist/"
-          TARGET: ${{ secrets.DEPLOY_TARGET }}
+      uses: easingthemes/ssh-deploy@v2.1.4
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_KEY }}
+        REMOTE_HOST: ${{ secrets.DEPLOY_HOST }}
+        REMOTE_USER: ${{ secrets.DEPLOY_USER }}
+        REMOTE_PORT: ${{ secrets.DEPLOY_PORT }}
+        SOURCE: "dist/"
+        TARGET: ${{ secrets.DEPLOY_TARGET }}
