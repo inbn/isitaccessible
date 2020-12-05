@@ -27,6 +27,7 @@ jobs:
       uses: easingthemes/ssh-deploy@v2.1.5
       env:
         SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_KEY }}
+        ARGS: "-rltgoDzvO --chown=www-data:www-data"
         REMOTE_HOST: ${{ secrets.DEPLOY_HOST }}
         REMOTE_USER: ${{ secrets.DEPLOY_USER }}
         REMOTE_PORT: ${{ secrets.DEPLOY_PORT }}
