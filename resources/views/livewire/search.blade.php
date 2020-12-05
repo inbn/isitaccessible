@@ -9,7 +9,7 @@
             Found {{ count($packages) }} results for “{{ $query }}”
         </p>
     @endif
-    <label for="search-input" class="block text-center">Enter the name of a package</label>
+    <label for="search-input" class="block text-center">Enter the name of a package. Use the arrow keys or your mouse to select a package or press enter to search.</label>
     <div
         role="combobox"
         aria-expanded="{{ !empty($packages) && !empty($query) ? 'true' : 'false' }}"
@@ -60,3 +60,5 @@
         </ol>
     @endif
 </div>
+
+@svg('search-by-algolia-light-background', ['class' => 'block mx-auto mt-4'])

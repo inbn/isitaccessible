@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Install dependencies
+    - name: Install composer dependencies
       uses: php-actions/composer@v4
     # - name: Set up Node
     #   uses: actions/setup-node@v1
@@ -23,7 +23,7 @@ jobs:
     #     git add -f public/
     #     git commit -m "Build front-end assets"
     #     git push -f origin deploy
-    - name: ssh deploy
+    - name: Deploy
       uses: easingthemes/ssh-deploy@v2.1.5
       env:
         SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_KEY }}
@@ -31,7 +31,7 @@ jobs:
         REMOTE_USER: ${{ secrets.DEPLOY_USER }}
         REMOTE_PORT: ${{ secrets.DEPLOY_PORT }}
         TARGET: ${{ secrets.DEPLOY_TARGET }}
-    - name: Deploy to production
+    - name: SSH and run commands
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.DEPLOY_HOST }}

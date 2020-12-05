@@ -20,14 +20,13 @@ class Search extends Component
     {
         $this->query = '';
         $this->packages = [];
-        $this->highlightIndex = 0;
+        $this->highlightIndex = -1; // No item highlighted
     }
 
     public function incrementHighlight()
     {
-        if ($this->highlightIndex === count($this->packages) - 1)
-        {
-            $this->highlightIndex = 0;
+        if ($this->highlightIndex === count($this->packages) - 1) {
+            $this->highlightIndex = -1;
             return;
         }
         $this->highlightIndex++;
@@ -35,8 +34,7 @@ class Search extends Component
 
     public function decrementHighlight()
     {
-        if ($this->highlightIndex === 0)
-        {
+        if ($this->highlightIndex === -1) {
             $this->highlightIndex = count($this->packages) - 1;
             return;
         }
@@ -67,7 +65,7 @@ class Search extends Component
     public function updatedQuery()
     {
         $this->packages = Package::search($this->query)
-            ->take(20)
+            ->take(12)
             ->get()
             ->toArray();
 

@@ -16,3 +16,11 @@ The app is designed so that packages get added to the database as they are searc
 ```
 php artisan db:seed
 ```
+
+## Front-end build process
+
+To watch for changes to JavaScript and CSS files, run the following command:
+
+```
+npm run watch
+```
