@@ -10,7 +10,7 @@ use App\Jobs\UpdatePackage;
 class PackageController extends Controller
 {
     /**
-     * Show the profile for the given user.
+     * Show the detail page for the given Package
      *
      * @param  string  $name
      * @return \Illuminate\View\View
@@ -20,10 +20,13 @@ class PackageController extends Controller
         $package = Package::firstOrCreate(['name' => $name]);
 
         $package->sync();
-
+        if (!$package->npm_sync_success)
+        {
+            abort(404, 'Couldn’t find that package on npm');
+        }
         if (!$package->repo)
         {
-            abort(404, 'Failed to find that package on npm');
+            abort(404, 'Couldn’t find GitHub info for that package');
         }
 
         return view('package.show', ['package' => $package]);

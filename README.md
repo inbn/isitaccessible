@@ -17,6 +17,22 @@ The app is designed so that packages get added to the database as they are searc
 php artisan db:seed
 ```
 
+### Fetching package data
+
+To get the latest data on a package from NPM / GitHub run the command:
+
+```
+php artisan package:update [package name]
+```
+
+### Updating the search index
+
+The app uses Laravel Scout with Algolia for its realtime search functionality. To sync the search index run:
+
+```
+php artisan scout:import "App\Models\Package"
+```
+
 ## Front-end build process
 
 To watch for changes to JavaScript and CSS files, run the following command:

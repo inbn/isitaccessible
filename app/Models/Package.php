@@ -120,14 +120,16 @@ class Package extends Model
         {
             $metadata = $data->collected->metadata;
 
+            $this->npm_sync_success = true;
             $this->description = isset($metadata->description) ? $metadata->description : null;
             $this->homepage_url = isset($data->collected->github->homepage)
                 ? $data->collected->github->homepage
-                : (isset($metadata->links->homepage) ? $metadata->links->homepage : NULL);
-            $this->repo = extractGitHubRepoFromUrl($metadata->repository->url);
+                : (isset($metadata->links->homepage) ? $metadata->links->homepage : null);
+            $this->repo = isset($metadata->repository->url) ? extractGitHubRepoFromUrl($metadata->repository->url) : null;
         }
         else
         {
+            $this->npm_sync_success = false;
             // Remove this record from the search index
             $this->unsearchable();
         }
@@ -143,6 +145,8 @@ class Package extends Model
     public function updateFromGitHub()
     {
         $repo = $this->repo;
+
+        $this->github_sync_success = false;
 
         if ($repo !== null)
         {
@@ -177,21 +181,24 @@ class Package extends Model
                 }
             }
 
-            $issues = $data['items'];
+            if ($data) {
+                $this->github_sync_success = true;
 
-            foreach ($issues as $issue)
-            {
-                GithubIssue::updateOrCreate(
-                    [
-                        'url' => $issue['html_url']
-                    ],
-                    [
-                        'package_id' => $this->id,
-                        'title' => $issue['title'],
-                        'state' => $issue['state'],
-                        'issue_created_at' => date('Y-m-d H:i:s', strtotime($issue['created_at'])),
-                    ]
-                );
+                $issues = $data['items'];
+
+                foreach ($issues as $issue) {
+                    GithubIssue::updateOrCreate(
+                        [
+                            'url' => $issue['html_url']
+                        ],
+                        [
+                            'package_id' => $this->id,
+                            'title' => $issue['title'],
+                            'state' => $issue['state'],
+                            'issue_created_at' => date('Y-m-d H:i:s', strtotime($issue['created_at'])),
+                        ]
+                    );
+                }
             }
         }
 
